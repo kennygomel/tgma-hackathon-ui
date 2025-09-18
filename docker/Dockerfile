@@ -1,7 +1,5 @@
-ARG NODE_VERSION="lts-alpine"
-
 # ----------- Build Stage -----------
-FROM node:${NODE_VERSION} AS build
+FROM node:lts-alpine AS build
 
 WORKDIR /app
 
@@ -11,22 +9,11 @@ RUN yarn install --frozen-lockfile
 
 COPY .. .
 
-# remove in case of second stage
-EXPOSE 5173
-
 RUN yarn build
 
 # ----------- Production Stage -----------
-#FROM node:${NODE_VERSION} AS production
-#
-#ARG NODE_ENV="production"
-#
-#ENV NODE_ENV=${NODE_ENV}
-#
-#WORKDIR /app
-#
-#COPY --from=build /app/dist ./
-#
-#EXPOSE 5173
-#
-#CMD ["node", "server/server.mjs"]
+FROM nginx:stable-alpine-slim AS production
+
+COPY --from=build /app/dist /usr/share/nginx/html
+
+CMD ["nginx", "-g", "daemon off;"]
