@@ -7,6 +7,3 @@ temp/
 logs/
 *.log
 *.swp
-
-# Include a specific log file despite the general log exclusion
-!logs/important.log
