@@ -1,5 +1,6 @@
 import type { DisplayDataRow } from '@/components/DisplayData/DisplayData.tsx';
 import {
+  initDataRaw as _initDataRaw,
   initDataState as _initDataState,
   type User,
   useSignal,
@@ -8,19 +9,46 @@ import { Section, Cell, Image, List, Tabbar } from '@telegram-apps/telegram-ui';
 import { Icon24ChevronDown } from '@telegram-apps/telegram-ui/dist/icons/24/chevron_down';
 import { Icon24ChevronLeft } from '@telegram-apps/telegram-ui/dist/icons/24/chevron_left';
 import { Icon24ChevronRight } from '@telegram-apps/telegram-ui/dist/icons/24/chevron_right';
-import { FC, useMemo } from 'react';
+import axios from 'axios';
+import { FC, useEffect, useMemo, useState } from 'react';
 
 import { Link } from '@/components/Link/Link.tsx';
 import { Page } from '@/components/Page.tsx';
 
-import tonSvg from './ton.svg';
+import userSvg from './user.svg';
 
 function getUserRows(user: User): DisplayDataRow[] {
   return Object.entries(user).map(([title, value]) => ({ title, value }));
 }
 
+const useAuth = () => {
+  // Состояние, указывающее, авторизован ли пользователь
+  const [isAuth, setIsAuth] = useState(false);
+
+  // Функция для отправки данных на сервер и получения статуса аутентификации
+  const signIn = async (initData: string) => {
+    console.log('initData', initData);
+    const { data } = await axios.post<boolean>(
+      'http://localhost:3000/auth/sign-in', // URL эндпоинта аутентификации
+      { initData }, // Передаем данные для входа
+    );
+    setIsAuth(data); // Устанавливаем статус аутентификации
+  };
+
+  return { isAuth, signIn };
+};
+
+
 export const IndexPage: FC = () => {
+  const { isAuth, signIn } = useAuth();
+  const initDataRaw = useSignal(_initDataRaw);
   const initDataState = useSignal(_initDataState);
+
+  useEffect(() => {
+    signIn(initDataRaw as string);
+  }, []);
+
+  alert(JSON.stringify(isAuth));
 
   const userRows = useMemo<DisplayDataRow[] | undefined>(() => {
     return initDataState && initDataState.user
@@ -39,10 +67,13 @@ export const IndexPage: FC = () => {
   return (
     <Page back={false}>
       <List>
-        <Section header="Мой аккаунт">
+        <Section
+          header="Мой аккаунт"
+          footer="You can use these pages to learn more about features, provided by Telegram Mini Apps and other useful projects"
+        >
           <Link to="/ton-connect">
             <Cell
-              before={<Image src={photoUrl || tonSvg} style={{ backgroundColor: '#007AFF' }}/>}
+              before={<Image src={photoUrl || userSvg} style={{ backgroundColor: '#007AFF' }}/>}
               subtitle={username ? `@${username}` : null}
             >
               {fullName}
