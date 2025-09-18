@@ -1,4 +1,7 @@
-import { Section, Cell, Image, List } from '@telegram-apps/telegram-ui';
+import { Section, Cell, Image, List, Tabbar } from '@telegram-apps/telegram-ui';
+import { Icon24ChevronDown } from '@telegram-apps/telegram-ui/dist/icons/24/chevron_down';
+import { Icon24ChevronLeft } from '@telegram-apps/telegram-ui/dist/icons/24/chevron_left';
+import { Icon24ChevronRight } from '@telegram-apps/telegram-ui/dist/icons/24/chevron_right';
 import type { FC } from 'react';
 
 import { Link } from '@/components/Link/Link.tsx';
@@ -38,6 +41,17 @@ export const IndexPage: FC = () => {
           </Link>
         </Section>
       </List>
+      <Tabbar>
+        <Tabbar.Item key="init" text="Init data" selected={false} onClick={() => alert('init')}>
+          <Icon24ChevronLeft />
+        </Tabbar.Item>
+        <Tabbar.Item key="launch" text="Launch params" selected={false} onClick={() => alert('launch')}>
+          <Icon24ChevronDown />
+        </Tabbar.Item>
+        <Tabbar.Item key="theme" text="Theme params" selected={false} onClick={() => alert('theme')}>
+          <Icon24ChevronRight />
+        </Tabbar.Item>
+      </Tabbar>
     </Page>
   );
 };
