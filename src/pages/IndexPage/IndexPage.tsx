@@ -1,3 +1,5 @@
+
+
 import type { DisplayDataRow } from '@/components/DisplayData/DisplayData.tsx';
 import {
   initDataRaw as _initDataRaw,
@@ -18,22 +20,21 @@ import { Page } from '@/components/Page.tsx';
 import userSvg from './user.svg';
 
 function getUserRows(user: User): DisplayDataRow[] {
-  return Object.entries(user).map(([title, value]) => ({ title, value }));
+  return Object.entries(user).map(([ title, value ]) => ({ title, value }));
 }
 
 const useAuth = () => {
-  // Состояние, указывающее, авторизован ли пользователь
-  const [isAuth, setIsAuth] = useState(false);
+  const [ isAuth, setIsAuth ] = useState(false);
 
-  // Функция для отправки данных на сервер и получения статуса аутентификации
-  const signIn = async (initData: string) => {
-    console.log('initData', initData);
+  const signIn = async (_initData: string) => {
+    const initData = 'user=%7B%22id%22%3A323173181%2C%22first_name%22%3A%22Ignat%22%2C%22last_name%22%3A%22Rychkov%22%2C%22username%22%3A%22ignatrychkov%22%2C%22language_code%22%3A%22ru%22%2C%22is_premium%22%3Atrue%2C%22allows_write_to_pm%22%3Atrue%2C%22photo_url%22%3A%22https%3A%5C%2F%5C%2Ft.me%5C%2Fi%5C%2Fuserpic%5C%2F320%5C%2Ff6LJeyec9XyXOSr_OXRWo3HKqbKFlfCYYkM01fOQalI.svg%22%7D&chat_instance=1432267138820610369&chat_type=private&auth_date=1758284032&signature=aC41ox5qarx_tQECxPQ_kO9Wjy_9NlZALi6pBQqaPEmqah6uMHuTw45HUQGccutAOVN_flii26CNwq72h2y7AQ&hash=a3a859a76ffa75f91abd7fc75234f0b81cfaa6c5e0c4ba1de13de34b798792ec';
     const { data } = await axios.post<boolean>(
-      'https://api.cybergarten.online/auth/sign-in', // URL эндпоинта аутентификации
-      { initData }, // Передаем данные для входа
+      `${process.env.REACT_APP_API_URL as string}/auth/sign-in`,
+      { initData },
+      { withCredentials: true }
     );
     console.log('data', data);
-    setIsAuth(data); // Устанавливаем статус аутентификации
+    setIsAuth(data);
   };
 
   return { isAuth, signIn };
@@ -41,7 +42,7 @@ const useAuth = () => {
 
 
 export const IndexPage: FC = () => {
-  const { isAuth, signIn } = useAuth();
+  const { signIn } = useAuth();
   const initDataRaw = useSignal(_initDataRaw);
   const initDataState = useSignal(_initDataState);
 
@@ -53,10 +54,10 @@ export const IndexPage: FC = () => {
     return initDataState && initDataState.user
       ? getUserRows(initDataState.user)
       : undefined;
-  }, [initDataState]);
+  }, [ initDataState ]);
 
   const fullName = userRows
-    ?.filter(row => ['first_name', 'last_name'].includes(row.title))
+    ?.filter(row => [ 'first_name', 'last_name' ].includes(row.title))
     .map(row => row.value)
     .filter(Boolean)
     .join(' ') as string;
@@ -72,7 +73,7 @@ export const IndexPage: FC = () => {
         >
           <Link to="/ton-connect">
             <Cell
-              before={<Image src={photoUrl || userSvg} style={{ backgroundColor: '#007AFF' }}/>}
+              before={<Image src={photoUrl || userSvg} style={{ backgroundColor: '#007AFF' }} />}
               subtitle={username ? `@${username}` : null}
             >
               {fullName}
