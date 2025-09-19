@@ -7,7 +7,7 @@ import {
   type User,
   useSignal,
 } from '@telegram-apps/sdk-react';
-import { Section, Cell, Image, List } from '@telegram-apps/telegram-ui';
+import { Section, Cell, Image, List, Spinner } from '@telegram-apps/telegram-ui';
 import { FC, useEffect, useMemo } from 'react';
 
 import { Link } from '@/components/Link/Link.tsx';
@@ -22,9 +22,13 @@ function getUserRows(user: User): DisplayDataRow[] {
 export const IndexPage: FC = () => {
   const initDataRaw = useSignal(_initDataRaw);
   const initDataState = useSignal(_initDataState);
-  const { data: user, loading, error } = useQuery<AuthUser>(() => AuthService.signIn(initDataRaw as string), []);
+  const { loading, error } = useQuery<AuthUser>(() => AuthService.signIn(initDataRaw as string), []);
 
-  console.log('user', user);
+  if (loading || error) {
+    return <div className="fixed inset-0 flex flex-row justify-center items-center">
+      {loading ? <Spinner size="l" /> : <p>Ошибка: {(error as Error).message}</p>}
+    </div>;
+  }
 
   const userRows = useMemo<DisplayDataRow[] | undefined>(() => {
     return initDataState && initDataState.user
@@ -39,9 +43,6 @@ export const IndexPage: FC = () => {
     .join(' ') as string;
   const photoUrl = userRows?.find(row => row.title === 'photo_url')?.value as string;
   const username = userRows?.find(row => row.title === 'username')?.value as string;
-
-  if (loading) return <p>Загрузка...</p>;
-  if (error) return <p>Ошибка: {(error as Error).message}</p>;
 
   return (
     <Page back={false}>
