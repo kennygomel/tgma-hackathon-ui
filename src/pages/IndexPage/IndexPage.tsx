@@ -22,7 +22,20 @@ function getUserRows(user: User): DisplayDataRow[] {
 export const IndexPage: FC = () => {
   const initDataRaw = useSignal(_initDataRaw);
   const initDataState = useSignal(_initDataState);
-  const { loading, error } = useQuery<AuthUser>(() => AuthService.signIn(initDataRaw as string), []);
+  const canSignIn = typeof initDataRaw === 'string' && initDataRaw.length > 0;
+  const { loading, error } = useQuery<AuthUser>(canSignIn ? () => AuthService.signIn(initDataRaw) : null, [canSignIn, initDataRaw]);
+
+  if (loading) {
+    return (<div className="fixed inset-0 flex flex-row justify-center items-center">
+      <Spinner size="l" />
+    </div>);
+  }
+
+  if (error) {
+    return (<div className="fixed inset-0 flex flex-row justify-center items-center">
+      <p>Ошибка: {(error as Error).message}</p>
+    </div>);
+  }
 
   const userRows = useMemo<DisplayDataRow[] | undefined>(() => {
     return initDataState && initDataState.user
@@ -37,18 +50,6 @@ export const IndexPage: FC = () => {
     .join(' ') as string;
   const photoUrl = userRows?.find(row => row.title === 'photo_url')?.value as string;
   const username = userRows?.find(row => row.title === 'username')?.value as string;
-
-  if (loading) {
-    return (<div className="fixed inset-0 flex flex-row justify-center items-center">
-      <Spinner size="l" />
-    </div>);
-  }
-
-  if (error) {
-    return (<div className="fixed inset-0 flex flex-row justify-center items-center">
-      <p>Ошибка: {(error as Error).message}</p>
-    </div>);
-  }
 
   return (
     <Page back={false}>
