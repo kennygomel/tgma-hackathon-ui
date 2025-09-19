@@ -1,3 +1,4 @@
+import { useAuth } from '@/auth/AuthContext.tsx';
 import type { DisplayDataRow } from '@/components/DisplayData/DisplayData.tsx';
 import { useQuery } from '@/hooks/useQuery.ts';
 import { AuthService, AuthUser } from '@/services/auth.service.ts';
@@ -8,7 +9,8 @@ import {
   useSignal,
 } from '@telegram-apps/sdk-react';
 import { Section, Cell, Image, List, Spinner } from '@telegram-apps/telegram-ui';
-import { FC, useEffect, useMemo } from 'react';
+import { Icon24PersonRemove } from '@telegram-apps/telegram-ui/dist/icons/24/person_remove';
+import { FC, useContext, useEffect, useMemo } from 'react';
 
 import { Link } from '@/components/Link/Link.tsx';
 import { Page } from '@/components/Page.tsx';
@@ -20,10 +22,8 @@ function getUserRows(user: User): DisplayDataRow[] {
 }
 
 export const IndexPage: FC = () => {
-  const initDataRaw = useSignal(_initDataRaw);
+  const { user, loading } = useAuth();
   const initDataState = useSignal(_initDataState);
-  const canSignIn = typeof initDataRaw === 'string' && initDataRaw.length > 0;
-  const { loading, error } = useQuery<AuthUser>(canSignIn ? () => AuthService.signIn(initDataRaw) : null, [canSignIn, initDataRaw]);
 
   const userRows = useMemo<DisplayDataRow[] | undefined>(() => {
     return initDataState && initDataState.user
@@ -45,9 +45,10 @@ export const IndexPage: FC = () => {
     </div>);
   }
 
-  if (error) {
-    return (<div className="fixed inset-0 flex flex-row justify-center items-center">
-      <p>Ошибка: {(error as Error).message}</p>
+  if (!user) {
+    return (<div className="fixed inset-0 flex flex-col justify-center items-center gap-3">
+      <Icon24PersonRemove style={{zoom: 2}} />
+      <p>Ошибка авторизации</p>
     </div>);
   }
 

@@ -1,41 +1,34 @@
-import axios from 'axios';
+import { AuthService, AuthUser } from '@/services/auth.service.ts';
+import {
+  initDataRaw as _initDataRaw,
+  useSignal,
+} from '@telegram-apps/sdk-react';
 import { createContext, useContext, useEffect, useState } from "react";
 
-// type User = { id: string; telegram_id: number; } | null;
 
 const AuthCtx = createContext<{
-  isAuthorized: boolean;
+  user: AuthUser | null;
   loading: boolean;
-  authorize: (initData: string) => Promise<void>;
-}>({isAuthorized:false,loading:true,authorize:async()=>{}});
+}>({user:null,loading:true});
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
+  const initDataRaw = useSignal(_initDataRaw);
+
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // попытка тихой авторизации по cookie/refresh
   useEffect(() => {
-    (async () => {
+    void (async () => {
       try {
-        const { data } = await axios.get<boolean>(`http://localhost:3000/auth/protected`, { withCredentials: true });
+        const user = await AuthService.signIn(initDataRaw as string);
 
-        setIsAuthorized(data);
+        setUser(user ?? null);
       } finally { setLoading(false); }
     })();
-  }, []);
-
-  const authorize = async (initData: string) => {
-    const { data } = await axios.post<boolean>(
-      `http://localhost:3000/auth/sign-in`,
-      { initData },
-      { withCredentials: true }
-    );
-
-    setIsAuthorized(data);
-  };
+  }, [initDataRaw]);
 
   return (
-    <AuthCtx.Provider value={{ isAuthorized, loading, authorize }}>
+    <AuthCtx.Provider value={{ user, loading }}>
       {children}
     </AuthCtx.Provider>
   );

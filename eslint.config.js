@@ -43,7 +43,8 @@ export default tseslint.config(
             '@typescript-eslint/no-unsafe-assignment': 0,
             '@typescript-eslint/no-unused-vars': 0,
             '@typescript-eslint/no-base-to-string': 0,
-            '@typescript-eslint/no-unsafe-member-access': 0
+            '@typescript-eslint/no-unsafe-member-access': 0,
+            '@typescript-eslint/ no-floating-promises': 0
         },
     }
 );

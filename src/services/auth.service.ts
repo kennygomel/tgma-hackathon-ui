@@ -13,4 +13,10 @@ export const AuthService = {
 
     return data as AuthUser;
   },
+
+  async refresh(): Promise<AuthUser> {
+    const { data } = await api.post('/auth/refresh', null);
+
+    return data as AuthUser;
+  },
 };
