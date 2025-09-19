@@ -32,6 +32,7 @@ const useAuth = () => {
       'http://localhost:3000/auth/sign-in', // URL эндпоинта аутентификации
       { initData }, // Передаем данные для входа
     );
+    console.log('data', data);
     setIsAuth(data); // Устанавливаем статус аутентификации
   };
 
@@ -47,8 +48,6 @@ export const IndexPage: FC = () => {
   useEffect(() => {
     signIn(initDataRaw as string);
   }, []);
-
-  alert(JSON.stringify(isAuth));
 
   const userRows = useMemo<DisplayDataRow[] | undefined>(() => {
     return initDataState && initDataState.user
