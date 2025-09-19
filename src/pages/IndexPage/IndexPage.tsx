@@ -29,7 +29,7 @@ const useAuth = () => {
   const signIn = async (initData: string) => {
     console.log('initData', initData);
     const { data } = await axios.post<boolean>(
-      'http://localhost:3000/auth/sign-in', // URL эндпоинта аутентификации
+      'https://api.cybergarten.online/auth/sign-in', // URL эндпоинта аутентификации
       { initData }, // Передаем данные для входа
     );
     console.log('data', data);
