@@ -18,7 +18,6 @@ function getUserRows(user: User): DisplayDataRow[] {
 }
 
 export const IndexPage: FC = () => {
-  const { loading } = useAuth();
   const initDataState = useSignal(_initDataState);
 
   const userRows = useMemo<DisplayDataRow[] | undefined>(() => {
@@ -34,12 +33,6 @@ export const IndexPage: FC = () => {
     .join(' ') as string;
   const photoUrl = userRows?.find(row => row.title === 'photo_url')?.value as string;
   const username = userRows?.find(row => row.title === 'username')?.value as string;
-
-  if (loading) {
-    return (<div className="fixed inset-0 flex flex-row justify-center items-center">
-      <Spinner size="l" />
-    </div>);
-  }
 
   return (
     <Page back={false}>

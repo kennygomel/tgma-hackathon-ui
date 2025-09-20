@@ -3,6 +3,7 @@ import {
   initDataRaw as _initDataRaw, User,
   useSignal,
 } from '@telegram-apps/sdk-react';
+import { Spinner } from '@telegram-apps/telegram-ui';
 import { Icon24PersonRemove } from '@telegram-apps/telegram-ui/dist/icons/24/person_remove';
 import { createContext, useContext, useEffect, useState } from "react";
 
@@ -31,18 +32,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })();
   }, [initDataRaw]);
 
-  if (!user || !me) {
+  if (loading) {
+    return (<div className="fixed inset-0 flex flex-row justify-center items-center">
+      <Spinner size="l" />
+    </div>);
+  } else if (!user) {
     return (<div className="fixed inset-0 flex flex-col justify-center items-center gap-3">
       <Icon24PersonRemove className="text-red-500" style={{zoom: 2}} />
       <p>Ошибка авторизации</p>
     </div>);
+  } else {
+    return (
+      <AuthCtx.Provider value={{ me, user, loading }}>
+        {children}
+      </AuthCtx.Provider>
+    );
   }
-
-  return (
-    <AuthCtx.Provider value={{ me, user, loading }}>
-      {children}
-    </AuthCtx.Provider>
-  );
 }
 
 export const useAuth = () => useContext(AuthCtx);
