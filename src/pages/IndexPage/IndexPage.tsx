@@ -1,16 +1,12 @@
 import { useAuth } from '@/auth/AuthContext.tsx';
 import type { DisplayDataRow } from '@/components/DisplayData/DisplayData.tsx';
-import { useQuery } from '@/hooks/useQuery.ts';
-import { AuthService, AuthUser } from '@/services/auth.service.ts';
 import {
-  initDataRaw as _initDataRaw,
   initDataState as _initDataState,
   type User,
   useSignal,
 } from '@telegram-apps/sdk-react';
 import { Section, Cell, Image, List, Spinner } from '@telegram-apps/telegram-ui';
-import { Icon24PersonRemove } from '@telegram-apps/telegram-ui/dist/icons/24/person_remove';
-import { FC, useContext, useEffect, useMemo } from 'react';
+import { FC, useMemo } from 'react';
 
 import { Link } from '@/components/Link/Link.tsx';
 import { Page } from '@/components/Page.tsx';
@@ -22,7 +18,7 @@ function getUserRows(user: User): DisplayDataRow[] {
 }
 
 export const IndexPage: FC = () => {
-  const { user, loading } = useAuth();
+  const { loading } = useAuth();
   const initDataState = useSignal(_initDataState);
 
   const userRows = useMemo<DisplayDataRow[] | undefined>(() => {
@@ -42,13 +38,6 @@ export const IndexPage: FC = () => {
   if (loading) {
     return (<div className="fixed inset-0 flex flex-row justify-center items-center">
       <Spinner size="l" />
-    </div>);
-  }
-
-  if (!user) {
-    return (<div className="fixed inset-0 flex flex-col justify-center items-center gap-3">
-      <Icon24PersonRemove style={{zoom: 2}} />
-      <p>Ошибка авторизации</p>
     </div>);
   }
 

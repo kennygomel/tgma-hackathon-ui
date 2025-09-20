@@ -1,3 +1,4 @@
+import { User } from '@telegram-apps/sdk-react';
 import { api } from '../lib/api.ts';
 
 export type AuthUser = { id: string; telegram_id: number; };
@@ -8,10 +9,10 @@ export const AuthService = {
     return data.user as AuthUser;
   },
 
-  async me(): Promise<AuthUser> {
+  async me(): Promise<User> {
     const { data } = await api.get('/auth/me');
 
-    return data as AuthUser;
+    return data as User;
   },
 
   async refresh(): Promise<AuthUser> {
